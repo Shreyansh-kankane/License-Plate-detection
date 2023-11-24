@@ -12,6 +12,11 @@ from keras.applications.mobilenet_v2 import preprocess_input
 from sklearn.preprocessing import LabelEncoder
 from tensorflow import keras
 import glob
+from PIL import Image
+import pytesseract
+import easyocr
+
+reader = easyocr.Reader(['en'])
 
 def load_model(path):
     try:
@@ -27,6 +32,11 @@ def load_model(path):
         print(e)
 wpod_net_path = "models/wpod-net.json"
 wpod_net = load_model(wpod_net_path)
+
+def prediction(imagepath):
+    #Enter all the texts below inside the given function , and provide the pass the request inside the function 
+    #then extract the media from post request and apply the model and functions to the given image
+    pass
 
 def preprocess_image(image_path,resize=False):
     img = cv2.imread(image_path)
@@ -51,8 +61,13 @@ fig = plt.figure(figsize=(12,6))
 grid = gridspec.GridSpec(ncols=2,nrows=1,figure=fig)
 fig.add_subplot(grid[0])
 plt.axis(False)
-plt.imshow(vehicle)
+#plt.imshow(vehicle)
 grid = gridspec.GridSpec(ncols=2,nrows=1,figure=fig)
 fig.add_subplot(grid[1])
 plt.axis(False)
-plt.imshow(LpImg[0])
+#plt.imshow(LpImg[0])
+
+converted_image = (LpImg[0] * 255).astype(np.uint8)
+image=Image.fromarray(converted_image)
+#reader = easyocr.Reader(['en'])
+result = reader.readtext(converted_image)
