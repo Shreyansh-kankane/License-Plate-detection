@@ -39,23 +39,28 @@ wpod_net = load_model(wpod_net_path)
 
 app = Flask(__name__)
 
-def preprocess_image(image_path,resize=False):
-    img = cv2.imread(image_path)
+def preprocess_image(image_uploaded,resize=False):
+
+    # Read the image from the file
+    image = Image.open(image_uploaded)
+
+    # Convert the image to a NumPy array
+    img = np.array(image)
     img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     img = img / 255
     if resize:
         img = cv2.resize(img, (224,224))
     return img
 
-def get_plate(image_path, Dmax=608, Dmin = 608):
-    vehicle = preprocess_image(image_path)
+def get_plate(image_uploaded, Dmax=608, Dmin = 608):
+    vehicle = preprocess_image(image_uploaded)
     ratio = float(max(vehicle.shape[:2])) / min(vehicle.shape[:2])
     side = int(ratio * Dmin)
     bound_dim = min(side, Dmax)
     _ , LpImg, _, cor = detect_lp(wpod_net, vehicle, bound_dim, lp_threshold=0.5)
     return vehicle, LpImg, cor
 
-@app.route('/hello/', methods=['GET', 'POST'])
+@app.route('/license/', methods=['POST'])
 def prediction():
     # if(request.method == "POST"):
 
@@ -64,8 +69,13 @@ def prediction():
     #     return request.method
 
 
-    test_image_path = "dataset/plate5.jpeg"
-    vehicle, LpImg, cor = get_plate(test_image_path)
+    #test_image_path = "dataset/plate5.jpeg"
+    if 'image' not in request.files:
+        return None  # No file uploaded
+
+    # Read the uploaded file from the request
+    uploaded_file = request.files['image']
+    vehicle, LpImg, cor = get_plate(uploaded_file)
 
     # fig = plt.figure(figsize=(12,6))
     # grid = gridspec.GridSpec(ncols=2,nrows=1,figure=fig)

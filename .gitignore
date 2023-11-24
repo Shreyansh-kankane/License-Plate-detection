@@ -1,3 +1,6 @@
 /__pycache__
 
 /licenseplate
+/license_plate_detection.py 
+/1_use_pretrained_model.ipynb
+/image_upload.html
