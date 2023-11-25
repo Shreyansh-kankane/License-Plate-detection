@@ -2,14 +2,15 @@
 FROM python:3.9
 
 # Set the working directory in the container
-WORKDIR /
+WORKDIR /app
 
 # Copy the Flask app code into the container
-#COPY . /app
+COPY . /app
+
+
 
 # Install required Python packages
-RUN pip install -r requirements.txt
-
+RUN pip install --no-cache-dir -r requirements.txt
 
 # Expose the port the app runs on
 EXPOSE 8080
