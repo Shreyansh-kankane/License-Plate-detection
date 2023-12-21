@@ -1,6 +1,7 @@
 from flask import Flask
 from flask import request
-
+from flask_cors import CORS, cross_origin
+from flask import jsonify
 import base64
 from io import BytesIO
 import tensorflow as tf
@@ -40,6 +41,8 @@ wpod_net = load_model(wpod_net_path)
 
 
 app = Flask(__name__)
+cors = CORS(app)
+app.config['CORS_HEADERS'] = 'Content-Type'
 
 def preprocess_image(image_uploaded,resize=False):
 
@@ -78,6 +81,7 @@ def convert_base64_to_image(base64_string):
 
 
 @app.route('/license/', methods=['POST'])
+@cross_origin()
 def prediction():
     print("request method entered")
     # if(request.method == "POST"):
@@ -86,7 +90,7 @@ def prediction():
     # else:
     #     return request.method
 
-    print(request.get_json())
+    # print(request.get_json())
     jobj = request.get_json()
     if 'image' not in jobj.keys():
         return None
@@ -113,7 +117,7 @@ def prediction():
     image=Image.fromarray(converted_image)
     #reader = easyocr.Reader(['en'])
     result = reader.readtext(converted_image)
-    return result[0][1]
+    return jsonify(result[0][1])
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8080)
